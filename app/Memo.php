@@ -10,7 +10,6 @@ class Memo extends Model
     public function myMemo($user_id)
     {
 
-        // タグの取得(queryparametorから取得 クエリーパラメータは右のやつ /?tag=test  )
         $tag = \Request::query('tag');
 
         // タグがなければその人が持ってるメモを全て取得

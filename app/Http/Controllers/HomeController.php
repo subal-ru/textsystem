@@ -49,18 +49,11 @@ class HomeController extends Controller
 
     public function store(Request $request)
     {
-        // postデータを整形？
-        // $data = $request->all();
-        // allよりonlyを使う方がデータ送信の際に不要データを何らかのバグで取得することがなくなる
+
         $data = $request->only(['tag', 'user_id', 'content']);
-        // POSTされたデータをDBに挿入
 
         // 先にタグにインサート
         // もし、同じタグが投稿された場合は新しくtagsテーブルにinsertせず、既存のタグを紐付ける
-        // existはtrue,falseで戻り値
-        // $exist_tag = Tag::where('user_id', $data['user_id'])->where('name', $data['tag'])->exists();
-        // if(empty($exist_tag)) {}
-
         if ($default_tag = Tag::where('name', $data['tag'])->where('user_id', $data['user_id'])->first()) {
             // 同じタグがあった場合
             $tag_id = $default_tag['id'];
@@ -75,13 +68,11 @@ class HomeController extends Controller
             );
         }
 
-        // MemoTag::insert(['memo'=> $memo_id, 'tag_id' => $tag_id]);
-
         // タグのidが判明
         // タグのIDをmemostableに入れる
 
         // MEMOモデルDBへ保存する命令を出す
-        // insertGetIdはModelの基本機能
+        // POSTされたデータをDBに挿入
         $memo_id = Memo::insertGetId(
             [
                 'content' => $data['content'],
@@ -98,8 +89,7 @@ class HomeController extends Controller
     public function edit($id)
     {
         $user = \Auth::user();
-        // $memos = Memo::where('status', 1)->where('user_id', $user['id'])->orderBy('updated_at', 'DESC')->get();
-        // // firstは1行のみ取得
+
         $memo = Memo::where('status', 1)->where('id', $id)->where('user_id', $user['id'])->first();
         // // 取得したメモをviewに渡す
         // $tags = Tag::where('user_id', $user['id'])->get();
@@ -124,7 +114,7 @@ class HomeController extends Controller
 
     public function delete(Request $request, $id)
     {
-        // status:2を削除データとする（DDには残す)論理削除と呼ぶ
+        // status:2を削除データとする（DBには残す)
         Memo::where('id', $id)->update(['status' => 2]);
         // 物理的に削除
         // Memo::where('id', $id)->delete();
